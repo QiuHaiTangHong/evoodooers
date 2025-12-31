@@ -1,0 +1,9 @@
+{
+  "comparator_output": 15,
+  "description": {
+    "translate": "item.evoodooers.day_record.desc",
+    "type": "translatable"
+  },
+  "length_in_seconds": 138.205,
+  "sound_event": "evoodooers:record.day"
+}

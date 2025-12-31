@@ -1,0 +1,21 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "pattern": [
+    " W ",
+    "WBW",
+    " W "
+  ],
+  "key": {
+    "W": {
+      "item": "minecraft:wheat"
+    },
+    "B": {
+      "item": "minecraft:bone"
+    }
+  },
+  "result": {
+    "id": "evoodooers:voodoo_doll"
+  },
+  "show_notification": true
+}

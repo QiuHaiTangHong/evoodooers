@@ -1,0 +1,15 @@
+{
+  "item.evoodooers.hair_tuft": "一撮毛发",
+  "item.evoodooers.hair_tuft.named": "一撮 %s 的毛发",
+  "item.evoodooers.day_record": "§b音乐唱片",
+  "item.evoodooers.day_record.desc": "LudoCrypt - Day",
+  "block.evoodooers.voodoo_doll": "巫毒娃娃",
+  "block.evoodooers.voodoo_doll.named": "%s 的娃娃",
+  "block.evoodooers.bed.no_hair": "你没在这张床上发现毛发。",
+  "block.evoodooers.bed.hair": "你在张床上发现了 %s 的毛发。",
+  "block.evoodooers.voodoo_doll.no_player": "这个娃娃没有绑定任何玩家。",
+  "block.evoodooers.voodoo_doll.no_player_found": "%s 不在这个世界中。",
+  "itemGroup.evoodooers_tab": "巫毒娃娃",
+  "message.evoodooers.bind": "§5诅咒将施加于: %s",
+  "message.evoodooers.release_curse": "%s 的诅咒, 已加诸 %s 之身. 好戏, 才刚刚开始..."
+}
