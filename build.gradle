@@ -21,9 +21,6 @@ subprojects {
     }
 
     jar {
-        from(rootProject.file("LICENSE")) {
-            rename { "${it}_${mod_name}" }
-        }
         manifest {
             attributes([
                     'Specification-Title'     : mod_name,
