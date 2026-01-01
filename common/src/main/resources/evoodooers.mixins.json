@@ -11,7 +11,7 @@
     "DedicatedServerMixin"
   ],
   "client": [
-    "client.MixinMinecraft"
+    "client.MinecraftMixin"
   ],
   "server": [
   ],

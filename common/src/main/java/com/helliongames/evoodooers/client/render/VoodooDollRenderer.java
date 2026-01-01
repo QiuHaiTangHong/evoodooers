@@ -22,19 +22,44 @@ import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 import org.jetbrains.annotations.NotNull;
 
+/**
+ * VoodooDollRenderer 类
+ * <p> 用于渲染 VoodooDoll 块实体的模型, 根据块实体的属性和玩家皮肤信息, 绘制出对应的玩家模型.
+ * 支持宽版和瘦版玩家模型的切换, 并根据块实体的旋转角度进行相应的姿态调整.
+ * @author QiuHaiTangHong
+ * @version 1.0.0
+ * @date 2026.01.01
+ * @since 1.0.0
+ */
 public class VoodooDollRenderer<T extends BlockEntity> implements BlockEntityRenderer<T> {
     private static final ResourceLocation TEXTURE = ResourceLocation.fromNamespaceAndPath(Constants.MOD_ID, "textures/block/voodoo_doll.png");
     /**
      * 玩家模型
      */
     private final PlayerModel<LivingEntity> wideModel;
+    /** 玩家的瘦模型, 用于表示玩家的瘦形态模型数据 */
     private final PlayerModel<LivingEntity> slimModel;
 
+    /**
+     * 初始化 VoodooDollRenderer
+     * <p> 根据提供的渲染上下文初始化宽版和瘦版玩家模型, 用于渲染幽灵娃娃
+     * @param context 渲染上下文, 用于获取模型层和烘焙模型
+     */
     public VoodooDollRenderer(BlockEntityRendererProvider.Context context) {
         this.wideModel = new PlayerModel<>(context.bakeLayer(ModelLayers.PLAYER), false);
         this.slimModel = new PlayerModel<>(context.bakeLayer(ModelLayers.PLAYER_SLIM), true);
     }
 
+    /**
+     * 渲染诅咒娃娃方块实体
+     * <p> 根据传入的方块实体和渲染参数, 渲染诅咒娃娃的模型, 包括娃娃本体和皮肤 (如果存在)
+     * @param blockEntity       方块实体对象, 用于获取方块状态和娃娃信息
+     * @param v                 渲染参数, 用于控制渲染效果
+     * @param poseStack         姿势堆栈, 用于保存和恢复渲染姿势
+     * @param multiBufferSource 多缓冲源, 用于获取渲染缓冲区
+     * @param packedLight       光照参数, 用于控制渲染光照效果
+     * @param packedOverlay     叠加参数, 用于控制渲染叠加效果
+     */
     @Override
     public void render(@NotNull T blockEntity, float v, @NotNull PoseStack poseStack, @NotNull MultiBufferSource multiBufferSource, int packedLight, int packedOverlay) {
         if (!(blockEntity instanceof VoodooDollBlockEntity voodooDoll)) return;

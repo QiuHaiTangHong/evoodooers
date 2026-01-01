@@ -51,9 +51,20 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.UUID;
 
+/**
+ * VoodooDollBlock 类
+ * <p> 该类代表一个魔法娃娃方块, 用于在游戏中实现与玩家互动的特殊功能. 该方块可以与玩家进行交互, 例如绑定玩家, 施加效果, 播放音效等. 它还支持旋转和动画效果, 用于增强游戏体验.
+ * @author QiuHaiTangHong
+ * @version 1.0.0
+ * @date 2026.01.01
+ * @since 1.0.0
+ */
 public class VoodooDollBlock extends BaseEntityBlock {
+    /** 旋转属性, 用于表示方块的旋转状态 */
     public static final IntegerProperty ROTATION = BlockStateProperties.ROTATION_16;
+    /** 用于解码 VoodooDollBlock 的编码器 */
     protected static final MapCodec<VoodooDollBlock> CODEC = simpleCodec(VoodooDollBlock::new);
+    /** 表示方块的碰撞形状, 定义了方块在游戏世界中的物理交互范围 */
     protected static final VoxelShape SHAPE = Block.box(4.0D, 0.0D, 4.0D, 12.0D, 16.0D, 12.0D);
 
     public VoodooDollBlock(Properties properties) {
@@ -61,11 +72,24 @@ public class VoodooDollBlock extends BaseEntityBlock {
         this.registerDefaultState(this.stateDefinition.any().setValue(ROTATION, 0));
     }
 
+    /**
+     * 返回该方块的编码器配置
+     * <p> 用于注册方块的编码器, 返回预定义的 CODEC 配置
+     * @return 方块的编码器配置
+     */
     @Override
     protected @NotNull MapCodec<? extends BaseEntityBlock> codec() {
         return CODEC;
     }
 
+    /**
+     * 当实体踩踏到该方块时触发的逻辑
+     * <p> 检查该方块是否有 VoodooDollBlockEntity, 如果有则获取目标玩家并施加减速效果
+     * @param level  当前世界
+     * @param pos    方块位置
+     * @param state  方块状态
+     * @param entity 触发踩踏的实体
+     */
     @Override
     public void stepOn(Level level, @NotNull BlockPos pos, @NotNull BlockState state, @NotNull Entity entity) {
         if (level.getBlockEntity(pos) instanceof VoodooDollBlockEntity voodooDoll) {
@@ -76,12 +100,34 @@ public class VoodooDollBlock extends BaseEntityBlock {
         }
     }
 
+    /**
+     * 在没有手持物品的情况下使用方块
+     * <p> 该方法用于处理玩家在没有手持物品时对方块的交互行为, 会根据玩家的旋转角度调整方块的旋转状态, 并返回成功交互的结果.
+     * @param state     方块当前的状态
+     * @param level     游戏世界对象
+     * @param pos       方块所在的位置
+     * @param player    与方块交互的玩家
+     * @param hitResult 玩家与方块的碰撞结果
+     * @return 交互结果, 表示交互是否成功
+     */
     @Override
     protected @NotNull InteractionResult useWithoutItem(@NotNull BlockState state, @NotNull Level level, @NotNull BlockPos pos, @NotNull Player player, @NotNull BlockHitResult hitResult) {
         level.setBlock(pos, state.setValue(ROTATION, RotationSegment.convertToSegment(player.getYRot() + 180.0f)), 1);
         return InteractionResult.SUCCESS;
     }
 
+    /**
+     * 处理物品在方块上的使用交互逻辑
+     * <p>该方法用于处理玩家使用物品对特定方块 (如灵魂娃娃) 进行交互时的行为逻辑, 包括绑定玩家, 施加效果, 触发爆炸等操作.
+     * @param heldItem  玩家手持的物品
+     * @param state     当前方块的状态
+     * @param level     当前世界层级
+     * @param pos       方块的位置
+     * @param player    使用物品的玩家
+     * @param hand      使用物品的手
+     * @param hitResult 玩家点击方块的命中结果
+     * @return 交互结果, 表示该交互是否成功, 消耗物品等
+     */
     @Override
     protected @NotNull ItemInteractionResult useItemOn(@NotNull ItemStack heldItem, @NotNull BlockState state, @NotNull Level level, @NotNull BlockPos pos, @NotNull Player player, @NotNull InteractionHand hand, @NotNull BlockHitResult hitResult) {
         if (level.getBlockEntity(pos) instanceof VoodooDollBlockEntity voodooDoll) {
@@ -208,6 +254,12 @@ public class VoodooDollBlock extends BaseEntityBlock {
         return super.useItemOn(heldItem, state, level, pos, player, hand, hitResult);
     }
 
+    /**
+     * 在指定位置生成魔法圆圈效果, 用于视觉展示
+     * <p> 通过循环计算粒子位置和速度, 向指定位置发送魔法粒子效果, 形成旋转收缩的视觉效果
+     * @param level 世界层级, 用于发送粒子效果
+     * @param pos   魔法圆圈生成的中心坐标
+     */
     private void spawnMagicCircle(ServerLevel level, BlockPos pos) {
         double radius = 1;
         int particleCount = 40;
@@ -235,6 +287,13 @@ public class VoodooDollBlock extends BaseEntityBlock {
         }
     }
 
+    /**
+     * 向指定玩家播放音效
+     * <p> 根据目标玩家的位置和方向计算音效播放位置, 并通过网络发送音效数据给客户端
+     * @param targetedPlayer 目标玩家
+     * @param sound          音效事件
+     * @param volume         音量
+     */
     private void playSoundToPlayer(Player targetedPlayer, SoundEvent sound, float volume) {
         if (targetedPlayer instanceof ServerPlayer serverPlayer) {
             float rot = serverPlayer.getYRot();
@@ -242,6 +301,14 @@ public class VoodooDollBlock extends BaseEntityBlock {
         }
     }
 
+    /**
+     * 根据傀儡的所有者 ID 查找对应玩家
+     * <p> 首先检查傀儡是否有所有者, 若没有则返回 null. 若存在所有者, 则遍历服务器中的所有世界, 查找对应 UUID 的玩家, 若找到则返回该玩家, 否则返回 null.
+     * @param interactingPlayer 与傀儡交互的玩家, 用于发送提示信息
+     * @param level             当前世界对象
+     * @param voodooDoll        傀儡实体对象
+     * @return 找到的玩家对象, 若未找到则返回 null
+     */
     public Player getTargetPlayer(@Nullable Player interactingPlayer, Level level, VoodooDollBlockEntity voodooDoll) {
         if (voodooDoll.getOwnerProfile() == null) {
             if (interactingPlayer != null)
@@ -267,6 +334,14 @@ public class VoodooDollBlock extends BaseEntityBlock {
         return targetedPlayer;
     }
 
+    /**
+     * 获取克隆物品堆栈
+     * <p> 根据给定的区块位置和状态获取克隆物品堆栈, 若该区块包含附魔娃娃方块实体且拥有所有者资料, 则将所有者 UUID 写入物品自定义数据中.
+     * @param level 区块所在的世界
+     * @param pos   区块位置
+     * @param state 区块状态
+     * @return 克隆物品堆栈
+     */
     @SuppressWarnings("deprecation")
     @Override
     @NotNull
@@ -280,6 +355,15 @@ public class VoodooDollBlock extends BaseEntityBlock {
         return stack;
     }
 
+    /**
+     * 设置方块被放置时的相关信息, 包括连接玩家的 UUID
+     * <p> 该方法在方块被放置时调用, 用于设置 VoodooDoll 方块实体的拥有者信息, 若物品有自定义数据且包含连接玩家的 UUID, 则将其设置为方块实体的拥有者.
+     * @param level  世界对象
+     * @param pos    方块位置
+     * @param state  方块状态
+     * @param entity 放置方块的实体 (可能为 null)
+     * @param stack  放置方块使用的物品堆栈
+     */
     @Override
     public void setPlacedBy(@NotNull Level level, @NotNull BlockPos pos, @NotNull BlockState state, @Nullable LivingEntity entity, @NotNull ItemStack stack) {
         super.setPlacedBy(level, pos, state, entity, stack);
@@ -297,11 +381,23 @@ public class VoodooDollBlock extends BaseEntityBlock {
         }
     }
 
+    /**
+     * 获取方块的渲染形状
+     * <p> 返回该方块的渲染形状, 用于控制方块在游戏中的显示方式.
+     * @param blockState 方块状态, 用于确定渲染形状
+     * @return 渲染形状, 不会为 null
+     */
     @Override
     public @NotNull RenderShape getRenderShape(@NotNull BlockState blockState) {
         return RenderShape.ENTITYBLOCK_ANIMATED;
     }
 
+    /**
+     * 根据放置上下文获取块状态
+     * <p> 根据给定的放置上下文, 返回调整旋转后的块状态, 将旋转角度增加 180 度后转换为段值
+     * @param blockPlaceContext 块放置上下文, 包含放置位置和方向等信息
+     * @return 调整旋转后的块状态
+     */
     @Override
     public BlockState getStateForPlacement(BlockPlaceContext blockPlaceContext) {
         return this.defaultBlockState().setValue(ROTATION, RotationSegment.convertToSegment(blockPlaceContext.getRotation() + 180.0f));
@@ -311,25 +407,57 @@ public class VoodooDollBlock extends BaseEntityBlock {
         return SHAPE;
     }
 
+    /**
+     * 定义方块状态的属性
+     * <p> 用于向状态定义器添加旋转属性, 以支持方块的旋转状态
+     * @param builder 状态定义构建器, 用于构建方块状态的定义
+     */
     @Override
     protected void createBlockStateDefinition(StateDefinition.Builder<Block, BlockState> builder) {
         builder.add(ROTATION);
     }
 
+    /**
+     * 获取方块状态的 Y 轴旋转角度 (以度为单位)
+     * <p> 将方块状态中的旋转值转换为对应的度数表示
+     * @param blockState 方块状态对象
+     * @return Y 轴旋转角度 (以度为单位)
+     */
     public float getYRotationDegrees(BlockState blockState) {
         return RotationSegment.convertToDegrees(blockState.getValue(ROTATION));
     }
 
+    /**
+     * 根据旋转方向旋转方块状态
+     * <p> 该方法用于根据指定的旋转方向对方块状态进行旋转操作, 更新其旋转属性值.
+     * @param blockState 当前方块状态
+     * @param rotation   旋转方向
+     * @return 旋转后的方块状态
+     */
     @Override
     public @NotNull BlockState rotate(BlockState blockState, Rotation rotation) {
         return blockState.setValue(ROTATION, rotation.rotate(blockState.getValue(ROTATION), 16));
     }
 
+    /**
+     * 对给定的方块状态进行镜像操作
+     * <p> 根据指定的镜像方式对方块状态的旋转值进行镜像处理, 返回新的方块状态
+     * @param blockState 要镜像的方块状态
+     * @param mirror     镜像方式
+     * @return 镜像处理后的方块状态
+     */
     @Override
     public @NotNull BlockState mirror(BlockState blockState, Mirror mirror) {
         return blockState.setValue(ROTATION, mirror.mirror(blockState.getValue(ROTATION), 16));
     }
 
+    /**
+     * 创建一个新的方块实体
+     * <p> 根据给定的坐标和方块状态生成并返回一个 VoodooDollBlockEntity 实例.
+     * @param blockPos   方块坐标
+     * @param blockState 方块状态
+     * @return 新创建的方块实体, 可能为 null
+     */
     @Nullable
     @Override
     public BlockEntity newBlockEntity(@NotNull BlockPos blockPos, @NotNull BlockState blockState) {

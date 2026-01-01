@@ -63,6 +63,17 @@ dependencies {
     testImplementation project(":common")
 }
 
+tasks.named('sourcesJar', Jar) {
+    from project(':common').sourceSets.main.allSource
+}
+
+// 2. 让 javadoc 任务包含 common 的源码进行解析
+tasks.named('javadoc', Javadoc) {
+    source project(':common').sourceSets.main.allJava
+    // 确保 classpath 包含 common 的依赖，否则无法解析引用
+    classpath += project(':common').sourceSets.main.compileClasspath
+}
+
 jar {
     from project(":common").sourceSets.main.output
 }

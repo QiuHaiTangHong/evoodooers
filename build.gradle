@@ -20,6 +20,19 @@ subprojects {
         }
     }
 
+    java {
+        withSourcesJar()
+        withJavadocJar()
+    }
+
+    tasks.withType(Javadoc).configureEach {
+        options.encoding = 'UTF-8'
+        options.addStringOption('Xdoclint:none', '-quiet') // 忽略 Javadoc 语法错误
+        if (JavaVersion.current().isJava9Compatible()) {
+            options.addBooleanOption('html5', true)
+        }
+    }
+
     jar {
         from(rootProject.file("LICENSE")) {
             rename { "${it}_${mod_name}" }

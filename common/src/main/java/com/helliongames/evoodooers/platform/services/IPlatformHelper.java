@@ -1,5 +1,13 @@
 package com.helliongames.evoodooers.platform.services;
 
+/**
+ * 平台辅助接口
+ * <p> 提供与当前运行平台相关的信息和辅助方法, 包括获取平台名称, 检查模组是否加载, 判断是否为开发环境等操作.
+ * @author QiuHaiTangHong
+ * @version 1.0.0
+ * @date 2026.01.01
+ * @since 1.0.0
+ */
 public interface IPlatformHelper {
 
     /**

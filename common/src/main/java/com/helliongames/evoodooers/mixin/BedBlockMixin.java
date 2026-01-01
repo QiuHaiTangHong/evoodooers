@@ -28,9 +28,27 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 import java.util.UUID;
 
+/**
+ * BedBlockMixin 混入类
+ * <p> 用于扩展 BedBlock 的功能, 实现玩家睡觉时记录最后睡觉的玩家信息, 并支持使用剪刀从床上获取头发的特殊交互逻辑.
+ * @author QiuHaiTangHong
+ * @version 1.0.0
+ * @date 2026.01.01
+ * @since 1.0.0
+ */
 @Mixin(BedBlock.class)
 public abstract class BedBlockMixin {
 
+    /**
+     * 在玩家睡觉时设置最后睡觉的玩家
+     * <p> 该方法在玩家睡觉时被调用, 用于记录最后睡觉的玩家信息. 仅在服务端执行, 若玩家正在睡觉, 则获取床的头部位置, 并更新对应的床块实体的最后睡觉玩家信息.
+     * @param state     床块的状态
+     * @param level     当前世界
+     * @param pos       床块的位置
+     * @param player    玩家对象
+     * @param hitResult 玩家点击床块的结果
+     * @param cir       回调信息, 用于返回交互结果
+     */
     @Inject(
             method = "useWithoutItem",
             at = @At("TAIL")
@@ -47,6 +65,16 @@ public abstract class BedBlockMixin {
         }
     }
 
+    /**
+     * 在床的头部使用剪刀时获取头发
+     * <p> 当玩家使用剪刀在床的头部进行交互时, 从床中获取头发并给予玩家, 同时更新相关状态和播放音效.
+     * @param state     床的块状态
+     * @param level     当前世界
+     * @param pos       床的位置
+     * @param player    使用物品的玩家
+     * @param hitResult 玩家点击的命中结果
+     * @param cir       回调信息, 用于设置返回值
+     */
     @Inject(method = "useWithoutItem", at = @At("HEAD"), cancellable = true)
     private void evoodooers_getHairFromBed(BlockState state, Level level, BlockPos pos, Player player, BlockHitResult hitResult, CallbackInfoReturnable<InteractionResult> cir) {
         ItemStack heldItem = player.getItemInHand(player.getUsedItemHand());
